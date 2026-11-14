@@ -1,0 +1,28 @@
+{
+  "name": "社区中心开放效果研究台",
+  "focus": "中心开放前后的地区服务时间序列",
+  "options": [
+    [
+      "outcome",
+      "服务指标",
+      [
+        "center",
+        "home",
+        "total"
+      ]
+    ],
+    [
+      "donor_scope",
+      "候选地区",
+      [
+        "all",
+        "unshared"
+      ]
+    ]
+  ],
+  "selection": {
+    "outcome": "total",
+    "donor_scope": "all"
+  },
+  "purpose": "社会服务分析资料复核"
+}

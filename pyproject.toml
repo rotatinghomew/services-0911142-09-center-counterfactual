@@ -1,0 +1,6 @@
+[project]
+name = "center-counterfactual"
+version = "0.1.0"
+description = "社区中心开放效果研究台"
+requires-python = ">=3.11"
+dependencies = []
