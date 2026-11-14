@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>社区中心开放效果研究台</title><link rel="stylesheet" href="/style.css"></head>
-<body><header><span>教研数据 · 复核工作区</span><h1>社区中心开放效果研究台</h1><p>中心开放前后的地区服务时间序列</p></header>
+<body><header><span>教研数据 · 复核工作区</span><h1>社区中心开放效果研究台</h1><p>中心开放前后的地区服务时间序列与合成对照反事实</p></header>
 <main><aside><h2>数据与范围</h2><label>数据版本<select id="revision"></select></label><div id="controls"></div>
 <button id="inspect">查看所选范围</button><label>导入完整数据<input id="upload" type="file" accept=".json,application/json"></label>
 <button id="raw">查看原始记录</button><h2>分析记录</h2><label>记录名称<input id="title" value="本次复核"></label>
@@ -10,4 +10,33 @@
 <h2>中心开放前后的地区服务时间序列</h2><div id="notes"></div><canvas id="chart" width="960" height="300" aria-label="所选范围描述图"></canvas>
 <div class="table-wrap"><table><thead id="columns"></thead><tbody id="rows"></tbody></table></div>
 <h2 id="detail-heading">记录与依据</h2><pre id="details">点击记录行可查看详细字段。</pre><button id="export">导出当前记录</button>
-</section></main><footer>仅使用本地虚构记录；描述统计不替代研究设计与业务复核。</footer><script src="/app.js"></script></body></html>
+</section></main>
+<section class="study-block"><h2>反事实分析：其他片区构造的合成对照</h2>
+<p class="study-intro">处理区为 A0（第52周开放中心）。对照资格随周变化：自身后来开放中心、或与 A0 存在共享队伍/跨区服务有效区间的片区，受污染后的记录不再作为未受影响对照。所有结果为接触次数口径，<strong>次数变化不等于受益人数变化</strong>。</p>
+<div id="study-status" role="status">正在准备反事实分析…</div>
+<div class="study-controls">
+<label>分析渠道<select id="study-outcome"><option value="center">center 中心</option><option value="home">home 上门</option><option value="total">total 总量</option></select></label>
+<label>候选范围<select id="study-scope"><option value="all">all 全部候选（动态剔除污染）</option><option value="unshared">unshared 排除共享队伍标记</option></select></label>
+<label>开放周<input id="study-treatment" type="number" min="1" max="103"></label>
+<label>训练截止周<input id="study-train-end" type="number" min="12" max="103"></label>
+<label>留时段起<input id="study-eval-start" type="number" min="0"></label>
+<label>留时段止<input id="study-eval-end" type="number" min="4"></label>
+<label>安慰剂开放周<input id="study-placebo" type="number" min="12"></label>
+<label class="check-label"><input id="study-rate" type="checkbox">按每千登记人口率展示</label>
+</div>
+<fieldset class="donor-box"><legend>候选地区资格（勾选为手动剔除；灰色为规则判定受污染，不可作为处理后对照）</legend><div id="study-eligibility"></div></fieldset>
+<div class="study-actions"><button id="study-run">运行反事实分析</button>
+<label>研究名称<input id="study-title" value="本次反事实研究"></label>
+<button id="study-save">冻结保存资格与权重</button>
+<button id="study-export">导出研究状态</button></div>
+<h3>结论与渠道缺口（同一 A0 居民人群口径）</h3><p id="study-conclusion"></p><div id="study-cards" class="study-cards"></div>
+<canvas id="study-chart" width="960" height="300" aria-label="实际与合成反事实轨迹"></canvas>
+<h3>识别诊断</h3><div id="study-diagnostics" class="diagnostics"></div>
+<h3>合成权重（仅训练窗口拟合一次，按所选渠道展示；total 为两渠道之和，不单独拟合）</h3><div class="table-wrap"><table><thead><tr><th>渠道</th><th>对照片区</th><th>权重</th></tr></thead><tbody id="study-weights"></tbody></table></div>
+<h3>安慰剂：各对照片区充当伪处理区</h3><div class="table-wrap"><table><thead><tr><th>伪处理区</th><th>训练期RMSPE</th><th>处理后周均缺口</th><th>处理后RMSPE</th></tr></thead><tbody id="study-placebo-rows"></tbody></table></div>
+<h3>留一地区：结论对单一对照的依赖</h3><div class="table-wrap"><table><thead><tr><th>剔除片区</th><th>训练期RMSPE</th><th>处理后周均缺口</th><th>原模型权重</th></tr></thead><tbody id="study-loo-rows"></tbody></table></div>
+<div id="study-notes" class="study-notes"></div>
+<h3>冻结的模型状态与依据</h3><pre id="study-details">运行分析后展示完整参数、资格、权重与诊断。</pre>
+<h3>已冻结研究</h3><div id="study-archive" class="archive-list"></div>
+</section>
+<footer>仅使用本地虚构记录；诊断不足时明确标注无法识别，不把单次个案外推为全市因果结论。</footer><script src="/app.js"></script></body></html>

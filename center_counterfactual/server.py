@@ -43,6 +43,11 @@ class Handler(BaseHTTPRequestHandler):
             if parsed.path.startswith("/api/notebooks/"):
                 identifier = parsed.path.rsplit("/", 1)[-1]
                 return self.send(200, self.workbench.store.notebook(identifier))
+            if parsed.path == "/api/studies":
+                return self.send(200, self.workbench.store.studies())
+            if parsed.path.startswith("/api/studies/"):
+                identifier = parsed.path.rsplit("/", 1)[-1]
+                return self.send(200, self.workbench.store.study_record(identifier))
             static = {"/": "index.html", "/app.js": "app.js", "/style.css": "style.css"}
             if parsed.path not in static:
                 return self.send(404, {"error": "路径不存在"})
@@ -61,6 +66,10 @@ class Handler(BaseHTTPRequestHandler):
                 raise ValueError("请求正文应为对象")
             if self.path == "/api/explore":
                 return self.send(200, self.workbench.inspect(body))
+            if self.path == "/api/studies":
+                if "title" in body:
+                    return self.send(201, self.workbench.save_study(body))
+                return self.send(200, self.workbench.study(body))
             if self.path == "/api/datasets":
                 return self.send(201, self.workbench.upload(body))
             if self.path == "/api/notebooks":

@@ -1,6 +1,6 @@
 {
   "name": "社区中心开放效果研究台",
-  "focus": "中心开放前后的地区服务时间序列",
+  "focus": "中心开放前后的地区服务时间序列与合成对照反事实",
   "options": [
     [
       "outcome",
@@ -23,6 +23,17 @@
   "selection": {
     "outcome": "total",
     "donor_scope": "all"
+  },
+  "analysis_defaults": {
+    "outcome": "home",
+    "donor_scope": "all",
+    "treatment_week": 52,
+    "train_end": 51,
+    "eval_start": 0,
+    "eval_end": 51,
+    "placebo_week": 25,
+    "excluded_areas": [],
+    "rate_per_1000": false
   },
   "purpose": "社会服务分析资料复核"
 }

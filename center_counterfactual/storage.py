@@ -39,6 +39,11 @@ class Store:
                     revision TEXT NOT NULL REFERENCES datasets(revision),
                     selection TEXT NOT NULL, result TEXT NOT NULL, created_at TEXT NOT NULL
                 );
+                CREATE TABLE IF NOT EXISTS studies (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL,
+                    revision TEXT NOT NULL REFERENCES datasets(revision),
+                    selection TEXT NOT NULL, result TEXT NOT NULL, created_at TEXT NOT NULL
+                );
             """)
 
     @contextmanager
@@ -87,6 +92,20 @@ class Store:
             identifier = cursor.lastrowid
         return self.notebook(identifier)
 
+    def save_study(self, title, revision, selection, result):
+        """保存反事实研究（资格、权重、模型状态随结果一起冻结）。"""
+        if not isinstance(title, str) or not title.strip() or len(title) > 160:
+            raise ValueError("研究名称应为1至160字")
+        with self.connection() as connection:
+            if connection.execute("SELECT 1 FROM datasets WHERE revision=?", (revision,)).fetchone() is None:
+                raise LookupError("数据版本不存在")
+            cursor = connection.execute(
+                "INSERT INTO studies(title,revision,selection,result,created_at) VALUES(?,?,?,?,?)",
+                (title.strip(), revision, encode(selection), encode(result),
+                 datetime.now(timezone.utc).isoformat()))
+            identifier = cursor.lastrowid
+        return self.study_record(identifier)
+
     def notebooks(self):
         with self.connection() as connection:
             return [dict(row) for row in connection.execute("SELECT id,title,revision,created_at FROM notebooks ORDER BY id DESC")]
@@ -96,6 +115,22 @@ class Store:
             row = connection.execute("SELECT * FROM notebooks WHERE id=?", (identifier,)).fetchone()
         if row is None:
             raise LookupError("分析记录不存在")
+        result = dict(row)
+        for field in ["selection", "result"]:
+            result[field] = json.loads(result[field])
+        result["dataset"] = self.dataset(result["revision"])
+        return result
+
+    def studies(self):
+        with self.connection() as connection:
+            return [dict(row) for row in connection.execute(
+                "SELECT id,title,revision,created_at FROM studies ORDER BY id DESC")]
+
+    def study_record(self, identifier):
+        with self.connection() as connection:
+            row = connection.execute("SELECT * FROM studies WHERE id=?", (identifier,)).fetchone()
+        if row is None:
+            raise LookupError("研究记录不存在")
         result = dict(row)
         for field in ["selection", "result"]:
             result[field] = json.loads(result[field])
